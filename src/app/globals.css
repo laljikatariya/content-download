@@ -1,8 +1,33 @@
 @import "tailwindcss";
 
-:root {
+/* Light defaults */
+html {
   --background: #ffffff;
   --foreground: #171717;
+  --surface: #ffffff; /* cards/inputs */
+  --border: #e5e7eb; /* neutral-200 */
+  --placeholder: #9ca3af; /* neutral-400 */
+}
+
+/* Dark when provider toggles html.dark or data-theme=dark */
+html.dark,
+html[data-theme="dark"] {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --surface: #111111; /* slightly lighter than page bg for inputs/cards */
+  --border: #262626; /* neutral-800 */
+  --placeholder: #6b7280; /* neutral-500 */
+}
+
+/* Auto-follow system theme when no explicit theme is set */
+@media (prefers-color-scheme: dark) {
+  html:not(.dark):not([data-theme]) {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+    --surface: #111111;
+    --border: #262626;
+    --placeholder: #6b7280;
+  }
 }
 
 @theme inline {
@@ -12,15 +37,23 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Form controls follow theme */
+input,
+textarea,
+select {
+  background-color: var(--surface);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--placeholder);
+  opacity: 1; /* ensure consistent across browsers */
 }

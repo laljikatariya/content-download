@@ -1,103 +1,213 @@
-import Image from "next/image";
+"use client";
+
+import { useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+
+const schema = z.object({
+  url: z
+    .string()
+    .min(1, "URL is required")
+    .url("Enter a valid Instagram post URL"),
+});
+
+type FormValues = z.infer<typeof schema>;
+
+type MediaItem = { url: string; type: string; thumbnail?: string };
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  // Allow targeting an external API base (e.g., Express server) via env
+  // If not set, default to same-origin (Next.js API during transition)
+  const API_BASE = (process.env.NEXT_PUBLIC_API_BASE || "").replace(/\/$/, "");
+  const apiUrl = (path: string) => `${API_BASE}${path}`;
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  const form = useForm<FormValues>({
+    resolver: zodResolver(schema),
+    defaultValues: { url: "" },
+  });
+
+  const { mutate, data, isPending, error, reset } = useMutation({
+    mutationFn: async (values: FormValues) => {
+      const res = await fetch(apiUrl("/api/resolve"), {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(values),
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(j?.error || `Failed to resolve (${res.status})`);
+      }
+      return (await res.json()) as { media: MediaItem[] };
+    },
+  });
+
+  const media = useMemo(() => data?.media ?? [], [data]);
+
+  return (
+    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
+      <div className="max-w-3xl mx-auto p-6">
+        <header className="py-6">
+          <h1 className="text-2xl font-semibold">Instagram Content Downloader</h1>
+          <p className="text-sm text-[var(--placeholder)] mt-1">
+            Paste a public Instagram content URL to resolve downloadable media. For educational and personal use only.
+          </p>
+        </header>
+
+        <section className="mt-4">
+          <form
+            onSubmit={form.handleSubmit((v) => mutate(v))}
+            className="flex gap-3 items-start"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+            <div className="flex-1">
+              <input
+                type="url"
+                placeholder="https://www.instagram.com/p/POST_ID/"
+                {...form.register("url")}
+                className="w-full rounded-md border px-3 py-2 outline-none focus:ring-0 focus:border-blue-500 bg-[var(--surface)] text-[var(--foreground)] border-[var(--border)]"
+              />
+              {form.formState.errors.url && (
+                <p className="text-red-600 text-sm mt-1">
+                  {form.formState.errors.url.message}
+                </p>
+              )}
+            </div>
+            <button
+              type="submit"
+              className="rounded-md bg-blue-600 text-white px-4 py-2 disabled:opacity-60"
+              disabled={isPending}
+            >
+              {isPending ? "Resolving..." : "Resolve"}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                form.reset();
+                reset();
+              }}
+              className="rounded-md border border-neutral-300 dark:border-neutral-700 px-4 py-2"
+            >
+              Clear
+            </button>
+          </form>
+          {error && (
+            <div className="mt-3 text-red-600 text-sm">{String(error.message)}</div>
+          )}
+        </section>
+
+        <section className="mt-8">
+          {!media.length ? (
+            <p className="text-sm text-[var(--placeholder)]">
+              No media yet. Enter a URL and click Resolve.
+            </p>
+          ) : (
+            <ul className={`grid gap-4 ${media.length === 1 ? 'justify-items-center' : 'sm:grid-cols-2'}`}>
+              {media.map((m, idx) => (
+                <li key={idx} className={`border border-[var(--border)] rounded-md overflow-hidden bg-[var(--surface)] ${media.length === 1 ? 'max-w-2xl w-full' : ''}`}>
+                  <div className="p-3 flex items-center justify-between">
+                    <span className="text-xs px-2 py-1 rounded bg-[var(--background)] border border-[var(--border)] uppercase">
+                      {m.type}
+                    </span>
+                    <span className="text-xs text-[var(--placeholder)] truncate max-w-[200px]" title={m.url}>
+                      {new URL(m.url).hostname}
+                    </span>
+                  </div>
+                  <div className="bg-neutral-900 aspect-square sm:aspect-video flex items-center justify-center overflow-hidden relative">
+                    {m.type?.toLowerCase() === "image" ? (
+                      // Render the original image through our proxy for CORS safety
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={m.url}
+                        alt="preview"
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                        crossOrigin="anonymous"
+                        onError={(e) => {
+                          // Fallback: try through proxy if direct fails
+                          const target = e.target as HTMLImageElement;
+                          const proxyUrl = apiUrl(`/api/download?disposition=inline&url=${encodeURIComponent(m.url)}`);
+                          if (target.src !== proxyUrl) {
+                            target.src = proxyUrl;
+                          } else {
+                            // Both failed, show error
+                            target.style.display = 'none';
+                            const parent = target.parentElement;
+                            if (parent && !parent.querySelector('.error-msg')) {
+                              const errorDiv = document.createElement('div');
+                              errorDiv.className = 'error-msg text-red-500 text-sm p-4';
+                              errorDiv.textContent = 'Failed to load image';
+                              parent.appendChild(errorDiv);
+                            }
+                          }
+                        }}
+                      />
+                    ) : m.type?.toLowerCase() === "video" ? (
+                      <video
+                        controls
+                        preload="metadata"
+                        className="w-full h-full object-contain"
+                        poster={m.thumbnail}
+                      >
+                        <source
+                          src={apiUrl(`/api/download?disposition=inline&url=${encodeURIComponent(m.url)}`)}
+                          // Let browser infer type if not known; upstream content-type will be forwarded
+                        />
+                        Your browser does not support the video tag.
+                      </video>
+                    ) : m.thumbnail ? (
+                      // Fallback to thumbnail if type is unknown
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={m.thumbnail} alt="thumbnail" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="p-4 text-xs text-[var(--placeholder)]">No preview available</div>
+                    )}
+                  </div>
+                  <div className="p-3 border-t border-[var(--border)] bg-[var(--surface)]">
+                    <a
+                      href={apiUrl(`/api/download?url=${encodeURIComponent(m.url)}`)}
+                      className="w-full inline-flex items-center justify-center gap-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900"
+                      aria-label="Download media"
+                    >
+                      Download
+                    </a>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        <section className="mt-10 border-t border-neutral-200 dark:border-neutral-800 pt-4">
+          <h2 className="font-medium mb-2">Disclaimer</h2>
+          <p className="text-xs text-[var(--placeholder)]">
+            Downloading media you do not own may violate Instagram’s Terms of Service and copyright laws. This tool is for educational and personal use only. Respect creators’ rights.
+          </p>
+        </section>
+
+        <footer className="mt-8 pt-6 border-t border-neutral-200 dark:border-neutral-800">
+          <div className="flex flex-wrap gap-4 justify-center text-xs text-[var(--placeholder)]">
+            <a href="/terms" className="hover:text-[var(--foreground)] transition-colors">
+              Terms & Conditions
+            </a>
+            <span>•</span>
+            <a href="/privacy" className="hover:text-[var(--foreground)] transition-colors">
+              Privacy Policy
+            </a>
+            <span>•</span>
+            <a href="/dmca" className="hover:text-[var(--foreground)] transition-colors">
+              DMCA Policy
+            </a>
+            <span>•</span>
+            <a href="/disclaimer" className="hover:text-[var(--foreground)] transition-colors">
+              Legal Disclaimer
+            </a>
+          </div>
+          <p className="text-center text-xs text-[var(--placeholder)] mt-4">
+            © {new Date().getFullYear()} Instagram Post Downloader. For educational purposes only.
+          </p>
+        </footer>
+      </div>
     </div>
   );
 }

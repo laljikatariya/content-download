@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Instagram Post Downloader (Next.js)
 
-## Getting Started
+Full‑stack Next.js app that lets you paste a public Instagram post URL, resolves direct media links via a configurable resolver API, and downloads media through a server endpoint.
 
-First, run the development server:
+Important: Downloading content you do not own may violate Instagram’s Terms of Service and applicable copyright laws. This tool is for educational and personal use only. Respect creators’ rights.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Tech Stack
+
+- Next.js (App Router) + TypeScript
+- Tailwind CSS (preconfigured)
+- React Query (@tanstack/react-query)
+- React Hook Form + Zod
+
+## Project Structure
+
+- `src/app/page.tsx` — UI: URL input, resolve, preview, download links
+- `src/app/api/resolve/route.ts` — POST: resolves Instagram URL to direct media links using a third‑party API (e.g., RapidAPI)
+- `src/app/api/download/route.ts` — GET: streams the media to the browser as an attachment
+- `src/app/layout.tsx` — Root layout and Providers
+- `src/app/providers.tsx` — React Query provider (client)
+
+## Environment Variables
+
+Create a `.env.local` file in the project root with the following variables if you want to use a RapidAPI resolver:
+
+```
+INSTAGRAM_SCRAPER_API_URL= https://instagram-downloader-download-post.p.rapidapi.com/  
+INSTAGRAM_SCRAPER_API_HOST= instagram-downloader-download-post.p.rapidapi.com  
+INSTAGRAM_SCRAPER_API_KEY= <your-rapidapi-key>
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Notes:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Many Instagram resolver endpoints exist on RapidAPI. Adjust `API_URL`, `API_HOST`, and the normalization logic in `src/app/api/resolve/route.ts` based on your chosen provider’s response shape.
+- The app does not scrape Instagram directly. It calls the configured third‑party resolver.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Running Locally
 
-## Learn More
+Install dependencies and start the dev server:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm install
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Open http://localhost:3000 and paste a public Instagram post URL (e.g. `https://www.instagram.com/p/<POST_ID>/`).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## How It Works
 
-## Deploy on Vercel
+1. The UI sends the URL to `/api/resolve` (server route).
+2. The server calls the configured resolver API to get direct media links.
+3. The UI presents media items and "Download" links.
+4. Clicking "Download" hits `/api/download?url=<media-url>` which streams the file to the browser with a content‑disposition header.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Limitations and Legal Notice
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Only public posts are supported. Private or removed content will fail.
+- Resolver APIs can be rate‑limited and may change their response format without notice.
+- Downloading content you do not own may violate Instagram’s Terms and copyright laws. Use this tool responsibly and obtain permission where required.
+
+## Customization
+
+- UI can be themed with Tailwind.
+- Add batch downloads and ZIP packaging by implementing a new server route that fetches multiple media files and streams a ZIP.
+- Add better previews by whitelisting domains in Next.js image config and switching to `next/image`.
+

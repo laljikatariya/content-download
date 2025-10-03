@@ -1,0 +1,9 @@
+{
+  // Silence CSS validator for Tailwind v4 at-rules like @theme
+  "css.lint.unknownAtRules": "ignore",
+
+  // Treat this stylesheet as Tailwind CSS for better IntelliSense
+  "files.associations": {
+    "src/app/globals.css": "tailwindcss"
+  }
+}
