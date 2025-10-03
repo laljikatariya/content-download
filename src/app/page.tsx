@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import Image from "next/image"; // ✅ Next.js optimized image
 
 const schema = z.object({
   url: z
@@ -121,12 +122,12 @@ export default function Home() {
                     </div>
                     <div className="bg-neutral-900 aspect-square sm:aspect-video flex items-center justify-center overflow-hidden relative">
                       {m.type?.toLowerCase() === "image" ? (
-                        <img
+                        <Image
                           src={m.url}
                           alt="preview"
+                          width={800}
+                          height={600}
                           className="w-full h-full object-cover"
-                          loading="lazy"
-                          crossOrigin="anonymous"
                         />
                       ) : m.type?.toLowerCase() === "video" ? (
                         <video
@@ -143,9 +144,11 @@ export default function Home() {
                           Your browser does not support the video tag.
                         </video>
                       ) : m.thumbnail ? (
-                        <img
+                        <Image
                           src={m.thumbnail}
                           alt="thumbnail"
+                          width={800}
+                          height={600}
                           className="w-full h-full object-cover"
                         />
                       ) : (
