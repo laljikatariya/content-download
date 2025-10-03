@@ -10,7 +10,7 @@ export default function PrivacyPage() {
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
       <div className="max-w-4xl mx-auto p-6">
         <Link href="/" className="text-blue-600 hover:text-blue-700 text-sm mb-4 inline-block">
-          ← Back to Home
+          &larr; Back to Home
         </Link>
         
         <h1 className="text-3xl font-bold mb-6">Privacy Policy</h1>
@@ -109,7 +109,7 @@ export default function PrivacyPage() {
 
         <div className="mt-12 pt-6 border-t border-neutral-200 dark:border-neutral-800">
           <Link href="/" className="text-blue-600 hover:text-blue-700 text-sm">
-            ← Back to Home
+            &larr; Back to Home
           </Link>
         </div>
       </div>

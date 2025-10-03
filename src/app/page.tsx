@@ -18,8 +18,6 @@ type FormValues = z.infer<typeof schema>;
 type MediaItem = { url: string; type: string; thumbnail?: string };
 
 export default function Home() {
-  // Allow targeting an external API base (e.g., Express server) via env
-  // If not set, default to same-origin (Next.js API during transition)
   const API_BASE = (process.env.NEXT_PUBLIC_API_BASE || "").replace(/\/$/, "");
   const apiUrl = (path: string) => `${API_BASE}${path}`;
 
@@ -48,6 +46,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
       <div className="max-w-3xl mx-auto p-6">
+        {/* Header */}
         <header className="py-6">
           <h1 className="text-2xl font-semibold">Instagram Content Downloader</h1>
           <p className="text-sm text-[var(--placeholder)] mt-1">
@@ -55,6 +54,7 @@ export default function Home() {
           </p>
         </header>
 
+        {/* Form */}
         <section className="mt-4">
           <form
             onSubmit={form.handleSubmit((v) => mutate(v))}
@@ -96,88 +96,81 @@ export default function Home() {
           )}
         </section>
 
+        {/* Media Preview (only first item) */}
         <section className="mt-8">
           {!media.length ? (
             <p className="text-sm text-[var(--placeholder)]">
               No media yet. Enter a URL and click Resolve.
             </p>
           ) : (
-            <ul className={`grid gap-4 ${media.length === 1 ? 'justify-items-center' : 'sm:grid-cols-2'}`}>
-              {media.map((m, idx) => (
-                <li key={idx} className={`border border-[var(--border)] rounded-md overflow-hidden bg-[var(--surface)] ${media.length === 1 ? 'max-w-2xl w-full' : ''}`}>
-                  <div className="p-3 flex items-center justify-between">
-                    <span className="text-xs px-2 py-1 rounded bg-[var(--background)] border border-[var(--border)] uppercase">
-                      {m.type}
-                    </span>
-                    <span className="text-xs text-[var(--placeholder)] truncate max-w-[200px]" title={m.url}>
-                      {new URL(m.url).hostname}
-                    </span>
-                  </div>
-                  <div className="bg-neutral-900 aspect-square sm:aspect-video flex items-center justify-center overflow-hidden relative">
-                    {m.type?.toLowerCase() === "image" ? (
-                      // Render the original image through our proxy for CORS safety
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={m.url}
-                        alt="preview"
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                        crossOrigin="anonymous"
-                        onError={(e) => {
-                          // Fallback: try through proxy if direct fails
-                          const target = e.target as HTMLImageElement;
-                          const proxyUrl = apiUrl(`/api/download?disposition=inline&url=${encodeURIComponent(m.url)}`);
-                          if (target.src !== proxyUrl) {
-                            target.src = proxyUrl;
-                          } else {
-                            // Both failed, show error
-                            target.style.display = 'none';
-                            const parent = target.parentElement;
-                            if (parent && !parent.querySelector('.error-msg')) {
-                              const errorDiv = document.createElement('div');
-                              errorDiv.className = 'error-msg text-red-500 text-sm p-4';
-                              errorDiv.textContent = 'Failed to load image';
-                              parent.appendChild(errorDiv);
-                            }
-                          }
-                        }}
-                      />
-                    ) : m.type?.toLowerCase() === "video" ? (
-                      <video
-                        controls
-                        preload="metadata"
-                        className="w-full h-full object-contain"
-                        poster={m.thumbnail}
+            <div className="flex justify-center">
+              {(() => {
+                const m = media[0]; // ✅ only first media item
+                return (
+                  <div className="border border-[var(--border)] rounded-md overflow-hidden bg-[var(--surface)] max-w-2xl w-full">
+                    <div className="p-3 flex items-center justify-between">
+                      <span className="text-xs px-2 py-1 rounded bg-[var(--background)] border border-[var(--border)] uppercase">
+                        {m.type}
+                      </span>
+                      <span
+                        className="text-xs text-[var(--placeholder)] truncate max-w-[200px]"
+                        title={m.url}
                       >
-                        <source
-                          src={apiUrl(`/api/download?disposition=inline&url=${encodeURIComponent(m.url)}`)}
-                          // Let browser infer type if not known; upstream content-type will be forwarded
+                        {new URL(m.url).hostname}
+                      </span>
+                    </div>
+                    <div className="bg-neutral-900 aspect-square sm:aspect-video flex items-center justify-center overflow-hidden relative">
+                      {m.type?.toLowerCase() === "image" ? (
+                        <img
+                          src={m.url}
+                          alt="preview"
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                          crossOrigin="anonymous"
                         />
-                        Your browser does not support the video tag.
-                      </video>
-                    ) : m.thumbnail ? (
-                      // Fallback to thumbnail if type is unknown
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={m.thumbnail} alt="thumbnail" className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="p-4 text-xs text-[var(--placeholder)]">No preview available</div>
-                    )}
+                      ) : m.type?.toLowerCase() === "video" ? (
+                        <video
+                          controls
+                          preload="metadata"
+                          className="w-full h-full object-contain"
+                          poster={m.thumbnail}
+                        >
+                          <source
+                            src={apiUrl(
+                              `/api/download?disposition=inline&url=${encodeURIComponent(m.url)}`
+                            )}
+                          />
+                          Your browser does not support the video tag.
+                        </video>
+                      ) : m.thumbnail ? (
+                        <img
+                          src={m.thumbnail}
+                          alt="thumbnail"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="p-4 text-xs text-[var(--placeholder)]">
+                          No preview available
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-3 border-t border-[var(--border)] bg-[var(--surface)]">
+                      <a
+                        href={apiUrl(`/api/download?url=${encodeURIComponent(m.url)}`)}
+                        className="w-full inline-flex items-center justify-center gap-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900"
+                        aria-label="Download media"
+                      >
+                        Download
+                      </a>
+                    </div>
                   </div>
-                  <div className="p-3 border-t border-[var(--border)] bg-[var(--surface)]">
-                    <a
-                      href={apiUrl(`/api/download?url=${encodeURIComponent(m.url)}`)}
-                      className="w-full inline-flex items-center justify-center gap-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900"
-                      aria-label="Download media"
-                    >
-                      Download
-                    </a>
-                  </div>
-                </li>
-              ))}
-            </ul>
+                );
+              })()}
+            </div>
           )}
         </section>
 
+        {/* Disclaimer */}
         <section className="mt-10 border-t border-neutral-200 dark:border-neutral-800 pt-4">
           <h2 className="font-medium mb-2">Disclaimer</h2>
           <p className="text-xs text-[var(--placeholder)]">
@@ -185,6 +178,7 @@ export default function Home() {
           </p>
         </section>
 
+        {/* Footer */}
         <footer className="mt-8 pt-6 border-t border-neutral-200 dark:border-neutral-800">
           <div className="flex flex-wrap gap-4 justify-center text-xs text-[var(--placeholder)]">
             <a href="/terms" className="hover:text-[var(--foreground)] transition-colors">

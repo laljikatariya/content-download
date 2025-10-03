@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Instagram Post Downloader (Next.js)
 
 Full‑stack Next.js app that lets you paste a public Instagram post URL, resolves direct media links via a configurable resolver API, and downloads media through a server endpoint.
@@ -64,3 +65,6 @@ Open http://localhost:3000 and paste a public Instagram post URL (e.g. `https://
 - Add batch downloads and ZIP packaging by implementing a new server route that fetches multiple media files and streams a ZIP.
 - Add better previews by whitelisting domains in Next.js image config and switching to `next/image`.
 
+=======
+# content-download
+>>>>>>> 428ca4bae0925561bc51f4c34fe95639c18948db

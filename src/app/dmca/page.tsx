@@ -10,7 +10,7 @@ export default function DMCAPage() {
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
       <div className="max-w-4xl mx-auto p-6">
         <Link href="/" className="text-blue-600 hover:text-blue-700 text-sm mb-4 inline-block">
-          ← Back to Home
+          &larr; Back to Home
         </Link>
         
         <h1 className="text-3xl font-bold mb-6">DMCA Copyright Policy</h1>
@@ -28,7 +28,7 @@ export default function DMCAPage() {
             <h2 className="text-xl font-semibold mb-3">Important Notice</h2>
             <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
               <p className="text-[var(--foreground)]">
-                <strong>This service does not host any content.</strong> We provide a tool that resolves publicly available URLs from Instagram. All content remains on Instagram's servers. We do not store, cache, or redistribute any media files.
+                <strong>This service does not host any content.</strong> We provide a tool that resolves publicly available URLs from Instagram. All content remains on Instagram&apos;s servers. We do not store, cache, or redistribute any media files.
               </p>
             </div>
           </section>
@@ -96,7 +96,7 @@ export default function DMCAPage() {
             <ul className="list-disc list-inside space-y-2 text-[var(--placeholder)] mt-2">
               <li>Only download content they own or have permission to download</li>
               <li>Respect copyright and intellectual property rights</li>
-              <li>Comply with Instagram's Terms of Service</li>
+              <li>Comply with Instagram&apos;s Terms of Service</li>
               <li>Use downloaded content responsibly and legally</li>
             </ul>
           </section>
@@ -104,7 +104,7 @@ export default function DMCAPage() {
 
         <div className="mt-12 pt-6 border-t border-neutral-200 dark:border-neutral-800">
           <Link href="/" className="text-blue-600 hover:text-blue-700 text-sm">
-            ← Back to Home
+            &larr; Back to Home
           </Link>
         </div>
       </div>

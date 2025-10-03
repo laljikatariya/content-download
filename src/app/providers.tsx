@@ -22,25 +22,24 @@ const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 function applyThemeToDocument(theme: ThemeMode) {
   if (typeof document === "undefined" || typeof window === "undefined") return;
-  const root = document.documentElement; // <html>
+  const root = document.documentElement;
   const isDark = theme === "dark";
 
-  // Toggle Tailwind dark variant
   root.classList.toggle("dark", isDark);
-  // Optional: expose data-theme for CSS hooks
   root.setAttribute("data-theme", isDark ? "dark" : "light");
 }
 
 function ThemeProvider({ children }: PropsWithChildren) {
   const [theme, setThemeState] = useState<ThemeMode>("light");
 
-  // On mount: read from localStorage or default to light; coerce any legacy 'system' to 'light'
+  // On mount: read from localStorage or default to light
   useEffect(() => {
     try {
       const stored = window.localStorage.getItem("theme");
-      let initial: ThemeMode = stored === "dark" ? "dark" : "light";
+      const initial: ThemeMode = stored === "dark" ? "dark" : "light"; // ✅ use const
       setThemeState(initial);
       applyThemeToDocument(initial);
+
       if (stored === "system") {
         // migrate legacy value
         window.localStorage.setItem("theme", initial);
@@ -74,7 +73,6 @@ export function useTheme() {
 }
 
 export default function Providers({ children }: PropsWithChildren) {
-  // Create QueryClient once per browser session
   const [client] = useState(() => new QueryClient());
   return (
     <ThemeProvider>

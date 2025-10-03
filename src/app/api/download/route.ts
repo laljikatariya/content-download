@@ -4,9 +4,11 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const rawUrl = searchParams.get("url");
-    // content disposition: 'attachment' (default) forces download, 'inline' enables preview in <img>/<video>
+
+    // content disposition: 'attachment' (default) forces download, 'inline' enables preview
     const dispositionParam = (searchParams.get("disposition") || "attachment").toLowerCase();
     const disposition: "attachment" | "inline" = dispositionParam === "inline" ? "inline" : "attachment";
+
     // Normalize common URL variants
     let mediaUrl = rawUrl?.trim() || "";
     if (mediaUrl.startsWith("//")) {
@@ -34,6 +36,7 @@ export async function GET(req: NextRequest) {
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 20000);
+
     // Forward Range header for video/audio seeking support
     const rangeHeader = req.headers.get("range");
     const upstream = await fetch(mediaUrl, {
@@ -44,25 +47,28 @@ export async function GET(req: NextRequest) {
 
     if (!upstream.ok || !upstream.body) {
       const text = await upstream.text().catch(() => "");
-      return new Response(JSON.stringify({ error: `Failed to fetch media (${upstream.status}): ${text || upstream.statusText}` }), {
-        status: 502,
-        headers: { "content-type": "application/json" },
-      });
+      return new Response(
+        JSON.stringify({ error: `Failed to fetch media (${upstream.status}): ${text || upstream.statusText}` }),
+        {
+          status: 502,
+          headers: { "content-type": "application/json" },
+        }
+      );
     }
 
     const contentType = upstream.headers.get("content-type") || "application/octet-stream";
-    const contentLength = upstream.headers.get("content-length") || undefined;
-    const contentRange = upstream.headers.get("content-range") || undefined;
-    const acceptRanges = upstream.headers.get("accept-ranges") || undefined;
-    const etag = upstream.headers.get("etag") || undefined;
-    const lastModified = upstream.headers.get("last-modified") || undefined;
+    const contentLength = upstream.headers.get("content-length") ?? undefined;
+    const contentRange = upstream.headers.get("content-range") ?? undefined;
+    const acceptRanges = upstream.headers.get("accept-ranges") ?? undefined;
+    const etag = upstream.headers.get("etag") ?? undefined;
+    const lastModified = upstream.headers.get("last-modified") ?? undefined;
 
     // Derive a filename from the URL path
     const pathname = new URL(mediaUrl).pathname;
     const namePart = pathname.split("/").filter(Boolean).pop() || "download";
     const filename = namePart.includes(".") ? namePart : `${namePart}.bin`;
 
-    // Build response headers, passing through key upstream values
+    // Build response headers
     const headers: Record<string, string> = {
       "content-type": contentType,
       "cache-control": "no-store",
@@ -72,15 +78,22 @@ export async function GET(req: NextRequest) {
     if (acceptRanges) headers["accept-ranges"] = acceptRanges;
     if (etag) headers["etag"] = etag;
     if (lastModified) headers["last-modified"] = lastModified;
-    // Set disposition according to query param
     headers["content-disposition"] = `${disposition}; filename="${filename}"`;
 
     return new Response(upstream.body, {
-      status: upstream.status, // e.g., 200 or 206 for range responses
+      status: upstream.status,
       headers,
     });
-  } catch (err: any) {
-    const msg = err?.name === "AbortError" ? "Request timed out" : err?.message || "Unexpected error";
+  } catch (err: unknown) {
+    let msg = "Unexpected error";
+
+    if (err instanceof Error) {
+      msg = err.message;
+      if (err.name === "AbortError") {
+        msg = "Request timed out";
+      }
+    }
+
     return new Response(JSON.stringify({ error: msg }), {
       status: 500,
       headers: { "content-type": "application/json" },

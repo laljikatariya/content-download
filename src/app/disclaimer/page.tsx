@@ -10,11 +10,13 @@ export default function DisclaimerPage() {
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
       <div className="max-w-4xl mx-auto p-6">
         <Link href="/" className="text-blue-600 hover:text-blue-700 text-sm mb-4 inline-block">
-          ← Back to Home
+          &larr; Back to Home
         </Link>
         
         <h1 className="text-3xl font-bold mb-6">Legal Disclaimer</h1>
-        <p className="text-sm text-[var(--placeholder)] mb-8">Last Updated: {new Date().toLocaleDateString()}</p>
+        <p className="text-sm text-[var(--placeholder)] mb-8">
+          Last Updated: {new Date().toLocaleDateString()}
+        </p>
 
         <div className="space-y-6 text-sm leading-relaxed">
           <section>
@@ -47,17 +49,17 @@ export default function DisclaimerPage() {
             </p>
             <ul className="list-disc list-inside space-y-2 text-[var(--placeholder)]">
               <li>You are solely responsible for your use of this service</li>
-              <li>You must comply with Instagram's Terms of Service</li>
+              <li>You must comply with Instagram&apos;s Terms of Service</li>
               <li>You must respect copyright and intellectual property rights</li>
               <li>You will not use this service for any illegal purposes</li>
-              <li>You understand that downloading content you don't own may violate copyright laws</li>
+              <li>You understand that downloading content you don&apos;t own may violate copyright laws</li>
             </ul>
           </section>
 
           <section>
             <h2 className="text-xl font-semibold mb-3">4. No Warranty</h2>
             <p className="text-[var(--placeholder)]">
-              This service is provided "AS IS" and "AS AVAILABLE" without any warranties of any kind, either express or implied, including but not limited to:
+              This service is provided &quot;AS IS&quot; and &quot;AS AVAILABLE&quot; without any warranties of any kind, either express or implied, including but not limited to:
             </p>
             <ul className="list-disc list-inside space-y-2 text-[var(--placeholder)] mt-2">
               <li>Warranties of merchantability or fitness for a particular purpose</li>
@@ -84,7 +86,7 @@ export default function DisclaimerPage() {
           <section>
             <h2 className="text-xl font-semibold mb-3">6. Third-Party Content</h2>
             <p className="text-[var(--placeholder)]">
-              All content accessed through this service originates from Instagram and is subject to Instagram's terms and policies. We do not host, store, or control any third-party content.
+              All content accessed through this service originates from Instagram and is subject to Instagram&apos;s terms and policies. We do not host, store, or control any third-party content.
             </p>
           </section>
 
@@ -126,7 +128,7 @@ export default function DisclaimerPage() {
           <section>
             <h2 className="text-xl font-semibold mb-3">12. Contact</h2>
             <p className="text-[var(--placeholder)]">
-              If you have questions about this disclaimer, please review our <Link href="/terms" className="text-blue-600 hover:underline">Terms & Conditions</Link> or contact us through appropriate channels.
+              If you have questions about this disclaimer, please review our <Link href="/terms" className="text-blue-600 hover:underline">Terms &amp; Conditions</Link> or contact us through appropriate channels.
             </p>
           </section>
 
@@ -139,7 +141,7 @@ export default function DisclaimerPage() {
 
         <div className="mt-12 pt-6 border-t border-neutral-200 dark:border-neutral-800">
           <Link href="/" className="text-blue-600 hover:text-blue-700 text-sm">
-            ← Back to Home
+            &larr; Back to Home
           </Link>
         </div>
       </div>
