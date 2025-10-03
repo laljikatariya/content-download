@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
 import ThemeToggle from "./theme-toggle";
+import { Analytics } from "@vercel/analytics/next"; // <-- added import
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,13 +27,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Providers>
           <ThemeToggle />
-          {/* React Query can be used without Provider for basic fetches, but we include it for future caching */}
           {children}
+          <Analytics /> {/* <-- added Analytics here */}
         </Providers>
       </body>
     </html>
