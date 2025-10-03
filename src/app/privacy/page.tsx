@@ -14,7 +14,9 @@ export default function PrivacyPage() {
         </Link>
         
         <h1 className="text-3xl font-bold mb-6">Privacy Policy</h1>
-        <p className="text-sm text-[var(--placeholder)] mb-8">Last Updated: {new Date().toLocaleDateString()}</p>
+        <p className="text-sm text-[var(--placeholder)] mb-8">
+          Last Updated: {new Date().toLocaleDateString()}
+        </p>
 
         <div className="space-y-6 text-sm leading-relaxed">
           <section>
@@ -79,7 +81,7 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mb-3">7. Children's Privacy</h2>
+            <h2 className="text-xl font-semibold mb-3">7. Children&apos;s Privacy</h2>
             <p className="text-[var(--placeholder)]">
               This service is not intended for users under 13 years of age. We do not knowingly collect personal information from children under 13.
             </p>
