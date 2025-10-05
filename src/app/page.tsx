@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -222,6 +223,16 @@ export default function Home() {
           )}
         </section>
       </div>
+      {/* Footer */}
+      <footer className="mt-10 text-center text-sm text-gray-500">
+        <p>
+          <Link href="/privacy" className="hover:underline">Privacy Policy</Link> |{" "}
+          <Link href="/terms" className="hover:underline">Terms of Service</Link> |{" "}
+          <Link href="/disclaimer" className="hover:underline">Disclaimer</Link> |{" "}
+          <Link href="/dmca" className="hover:underline">DMCA</Link>
+        </p>
+        <p className="mt-2">&copy; {new Date().getFullYear()} Fast Download</p>
+      </footer>
     </div>
   );
 }
