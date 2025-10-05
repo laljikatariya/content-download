@@ -3,6 +3,14 @@ import Link from "next/link";
 export const metadata = {
   title: "Legal Disclaimer - Instagram Post Downloader",
   description: "Legal disclaimer and limitations for our service.",
+  alternates: { canonical: "/disclaimer" },
+  openGraph: {
+    title: "Legal Disclaimer - Instagram Post Downloader",
+    description: "Legal disclaimer and limitations for our service.",
+    url: "/disclaimer",
+    siteName: "Instagram Post Downloader",
+    type: "article",
+  },
 };
 
 export default function DisclaimerPage() {

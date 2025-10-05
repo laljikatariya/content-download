@@ -10,13 +10,12 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
-    "@tanstack/react-query": "^5.89.0",
+    "@tanstack/react-query": "^5.90.2",
     "@vercel/analytics": "^1.5.0",
-    "axios": "^1.12.2",
-    "next": "15.5.3",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
-    "react-hook-form": "^7.63.0",
+    "next": "^15.5.3",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-hook-form": "^7.64.0",
     "zod": "^4.1.11"
   },
   "devDependencies": {
@@ -29,5 +28,18 @@
     "eslint-config-next": "15.5.3",
     "tailwindcss": "^4",
     "typescript": "^5"
-  }
+  },
+  "description": "<<<<<<< HEAD\r # Instagram Post Downloader (Next.js)",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/laljikatariya/content-download.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/laljikatariya/content-download/issues"
+  },
+  "homepage": "https://github.com/laljikatariya/content-download#readme"
 }

@@ -3,6 +3,14 @@ import Link from "next/link";
 export const metadata = {
   title: "Privacy Policy - Instagram Post Downloader",
   description: "Privacy policy for our Instagram post downloader service.",
+  alternates: { canonical: "/privacy" },
+  openGraph: {
+    title: "Privacy Policy - Instagram Post Downloader",
+    description: "Privacy policy for our Instagram post downloader service.",
+    url: "/privacy",
+    siteName: "Instagram Post Downloader",
+    type: "article",
+  },
 };
 
 export default function PrivacyPage() {

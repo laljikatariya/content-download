@@ -18,6 +18,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Instagram Post Downloader",
   description: "Resolve and download media from Instagram post URLs.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
 };
 
 export default function RootLayout({
@@ -30,6 +31,26 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Providers>
           <ThemeToggle />
+          {/* JSON-LD Structured Data */}
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                '@context': 'https://schema.org',
+                '@type': 'WebSite',
+                name: 'Instagram Post Downloader',
+                url: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+                potentialAction: {
+                  '@type': 'SearchAction',
+                  target: {
+                    '@type': 'EntryPoint',
+                    urlTemplate: (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000') + '/?url={instagramUrl}',
+                  },
+                  'query-input': 'required name=instagramUrl',
+                },
+              }),
+            }}
+          />
           {children}
           <Analytics /> {/* <-- added Analytics here */}
         </Providers>

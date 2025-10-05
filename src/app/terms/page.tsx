@@ -3,6 +3,14 @@ import Link from "next/link";
 export const metadata = {
   title: "Terms & Conditions - Instagram Post Downloader",
   description: "Terms and conditions for using our Instagram post downloader service.",
+  alternates: { canonical: "/terms" },
+  openGraph: {
+    title: "Terms & Conditions - Instagram Post Downloader",
+    description: "Terms and conditions for using our Instagram post downloader service.",
+    url: "/terms",
+    siteName: "Instagram Post Downloader",
+    type: "article",
+  },
 };
 
 export default function TermsPage() {
