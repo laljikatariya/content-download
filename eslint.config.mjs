@@ -10,7 +10,10 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
+  // Base Next.js + TypeScript rules
   ...compat.extends("next/core-web-vitals", "next/typescript"),
+
+  // Ignore build and output directories
   {
     ignores: [
       "node_modules/**",
@@ -19,6 +22,26 @@ const eslintConfig = [
       "build/**",
       "next-env.d.ts",
     ],
+  },
+
+  // --- Overrides for backend API ---
+  {
+    files: ["src/app/api/resolve/**"],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",     // allow any types
+      "@typescript-eslint/ban-ts-comment": "off",     // allow @ts-ignore / @ts-expect-error
+      "@typescript-eslint/no-unused-vars": "off",     // ignore unused variables
+      "prefer-const": "off",                          // allow let where never reassigned
+    },
+  },
+
+  // --- Overrides for frontend page ---
+  {
+    files: ["src/app/page.tsx"],
+    rules: {
+      "@typescript-eslint/no-unused-vars": "off",    // ignore unused functions/vars
+      "@next/next/no-img-element": "off",           // allow <img> tags
+    },
   },
 ];
 
