@@ -1,33 +1,12 @@
 @import "tailwindcss";
 
-/* Light defaults */
+/* Light theme only */
 html {
   --background: #ffffff;
   --foreground: #171717;
   --surface: #ffffff; /* cards/inputs */
   --border: #e5e7eb; /* neutral-200 */
   --placeholder: #9ca3af; /* neutral-400 */
-}
-
-/* Dark when provider toggles html.dark or data-theme=dark */
-html.dark,
-html[data-theme="dark"] {
-  --background: #0a0a0a;
-  --foreground: #ededed;
-  --surface: #111111; /* slightly lighter than page bg for inputs/cards */
-  --border: #262626; /* neutral-800 */
-  --placeholder: #6b7280; /* neutral-500 */
-}
-
-/* Auto-follow system theme when no explicit theme is set */
-@media (prefers-color-scheme: dark) {
-  html:not(.dark):not([data-theme]) {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --surface: #111111;
-    --border: #262626;
-    --placeholder: #6b7280;
-  }
 }
 
 @theme inline {
@@ -61,4 +40,177 @@ input::placeholder,
 textarea::placeholder {
   color: var(--placeholder);
   opacity: 1; /* ensure consistent across browsers */
+}
+
+/* Gradient text effect */
+.gradient-text {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Hide scrollbar for menu */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Animation for fade in */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Shimmer animation for loading */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}
+
+/* Slow spin for loading */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
+}
+
+/* Mobile touch improvements */
+@media (hover: none) and (pointer: coarse) {
+  /* Larger touch targets for mobile */
+  button, a, input {
+    min-height: 44px; /* Apple's recommended minimum touch target */
+  }
+  
+  /* Disable hover effects on touch devices */
+  button:hover {
+    transform: none;
+  }
+}
+
+/* Better text rendering on mobile */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Prevent zoom on input focus (iOS) */
+@media screen and (max-width: 768px) {
+  input[type="text"],
+  input[type="url"],
+  input[type="email"],
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Safe area insets for notched devices */
+@supports (padding: max(0px)) {
+  body {
+    padding-left: max(0px, env(safe-area-inset-left));
+    padding-right: max(0px, env(safe-area-inset-right));
+  }
+}
+
+/* Modern loading animations */
+@keyframes shimmer-slow {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+.animate-shimmer-slow {
+  animation: shimmer-slow 3s ease-in-out infinite;
+}
+
+@keyframes progress {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-progress {
+  animation: progress 1.5s ease-in-out infinite;
+}
+
+/* Smooth slide up animation for preview cards */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slideUp {
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Scale in animation for icons */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scaleIn {
+  animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Pulse glow effect */
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(59, 130, 246, 0);
+  }
+}
+
+.animate-pulseGlow {
+  animation: pulseGlow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
