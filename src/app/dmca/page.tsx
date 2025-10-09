@@ -44,7 +44,7 @@ export default function DMCAPage() {
             </p>
             <ul className="list-disc list-inside space-y-2">
               <li>Ensuring they have the right to download and use content</li>
-              <li>Complying with copyright laws and Instagram's Terms of Service</li>
+              <li>Complying with copyright laws and Instagram&apos;s Terms of Service</li>
               <li>Obtaining necessary permissions from content creators</li>
               <li>Using downloaded content in accordance with applicable laws</li>
             </ul>
@@ -91,7 +91,7 @@ export default function DMCAPage() {
               <li><strong>No Content Hosting:</strong> We do not store or host any Instagram content</li>
               <li><strong>User Responsibility:</strong> Users are responsible for their downloads and usage</li>
               <li><strong>Contact Instagram:</strong> For content removal, contact Instagram directly</li>
-              <li><strong>Legal Compliance:</strong> Users must comply with copyright laws and Instagram's TOS</li>
+              <li><strong>Legal Compliance:</strong> Users must comply with copyright laws and Instagram&apos;s TOS</li>
             </ul>
           </section>
         </div>

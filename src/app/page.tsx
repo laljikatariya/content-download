@@ -1,13 +1,11 @@
 "use client";
 
-import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-// Assuming @tanstack/react-query is available in the environment
-import { useMutation } from "@tanstack/react-query"; 
-// The import for "next/image" has been removed to fix the compilation error.
+import { useMutation } from "@tanstack/react-query";
+import Image from "next/image"; // ✅ Next.js optimized image
 
 // Zod schema for input validation
 const schema = z.object({
@@ -19,7 +17,6 @@ type FormValues = z.infer<typeof schema>;
 type MediaItem = { url: string; type: "image" | "video" };
 
 export default function Home() {
-  // Utility function to handle API base URL (if needed in deployment)
   const API_BASE = (process.env.NEXT_PUBLIC_API_BASE || "").replace(/\/$/, "");
   const apiUrl = (path: string) => `${API_BASE}${path}`;
 
@@ -50,44 +47,19 @@ export default function Home() {
 
   // Extracts the array of media items from the mutation result
   const media = useMemo(() => data?.media ?? [], [data]);
-  const [aspectMap, setAspectMap] = useState<Record<number, string>>({});
-
-  const copyToClipboard = async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      // noop UI; could add toast if desired
-    } catch {}
-  };
-
-  type Variant = 'image' | 'video' | 'reel';
-  const getVariant = (m: MediaItem): Variant => {
-    const inputUrl = form.getValues().url || '';
-    if (/\/reel\//i.test(inputUrl)) return 'reel';
-    return m.type === 'video' ? 'video' : 'image';
-  };
-  const getCardRing = (v: Variant) =>
-    v === 'reel'
-      ? 'ring-1 ring-purple-500/30'
-      : v === 'video'
-      ? 'ring-1 ring-blue-500/30'
-      : 'ring-1 ring-emerald-500/20';
-  const getBadgeClasses = (v: Variant) =>
-    v === 'reel'
-      ? 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/20 dark:text-purple-200 dark:border-purple-800'
-      : v === 'video'
-      ? 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-200 dark:border-blue-800'
-      : 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-200 dark:border-emerald-800';
 
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
       <div className="max-w-3xl mx-auto p-6">
+        {/* Header */}
         <header className="py-6">
           <h1 className="text-2xl font-semibold">Instagram Content Downloader</h1>
           <p className="text-sm text-[var(--placeholder)] mt-1">
-            Paste a public Instagram URL to resolve downloadable media. For educational/personal use only.
+            Paste a public Instagram content URL to resolve downloadable media. For educational and personal use only.
           </p>
         </header>
 
+        {/* Form */}
         <section className="mt-4">
           <form
             onSubmit={form.handleSubmit((v) => mutate(v))}
@@ -98,11 +70,12 @@ export default function Home() {
                 type="url"
                 placeholder="https://www.instagram.com/p/POST_ID/"
                 {...form.register("url")}
-                className="w-full rounded-md border px-3 py-2 outline-none focus:ring-0 focus:focus:border-blue-500 bg-[var(--surface)] text-[var(--foreground)] border-[var(--border)]"
-                disabled={isPending}
+                className="w-full rounded-md border px-3 py-2 outline-none focus:ring-0 focus:border-blue-500 bg-[var(--surface)] text-[var(--foreground)] border-[var(--border)]"
               />
               {form.formState.errors.url && (
-                <p className="text-red-600 text-sm mt-1">{form.formState.errors.url.message}</p>
+                <p className="text-red-600 text-sm mt-1">
+                  {form.formState.errors.url.message}
+                </p>
               )}
             </div>
             <button
@@ -116,123 +89,126 @@ export default function Home() {
               type="button"
               onClick={() => {
                 form.reset();
-                reset(); // Resets the useMutation state (data, error)
+                reset();
               }}
               className="rounded-md border border-neutral-300 dark:border-neutral-700 px-4 py-2"
-              disabled={isPending}
             >
               Clear
             </button>
           </form>
-          {error && <div className="mt-3 text-red-600 text-sm">{String(error.message)}</div>}
+          {error && (
+            <div className="mt-3 text-red-600 text-sm">{String(error.message)}</div>
+          )}
         </section>
 
+        {/* Media Preview (only first item) */}
         <section className="mt-8">
-          {!media.length && !isPending ? (
-            <p className="text-sm text-[var(--placeholder)]">No media yet. Enter a URL and click Resolve.</p>
+          {!media.length ? (
+            <p className="text-sm text-[var(--placeholder)]">
+              No media yet. Enter a URL and click Resolve.
+            </p>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {isPending && [0, 1].map((i) => (
-                <div key={`s-${i}`} className="rounded-xl border border-[var(--border)] bg-[var(--surface)] shadow-sm overflow-hidden animate-pulse">
-                  <div className="h-3.5 bg-neutral-200 dark:bg-neutral-800 m-4 rounded w-24" />
-                  <div className="aspect-video bg-neutral-200 dark:bg-neutral-800" />
-                  <div className="h-9 bg-neutral-200 dark:bg-neutral-800 m-4 rounded" />
-                </div>
-              ))}
-
-              {media.map((m, idx) => {
-                const variant = getVariant(m);
-                const fallbackAspect = variant === 'reel' ? '9/16' : '16/9';
+            <div className="flex justify-center">
+              {(() => {
+                const m = media[0]; // ✅ only first media item
                 return (
-                <div key={idx} className={`rounded-xl border border-[var(--border)] bg-[var(--surface)] shadow-sm overflow-hidden ${getCardRing(variant)}`}>
-
-                  {/* Media */}
-                  <div
-                    className={`relative overflow-hidden bg-[var(--surface)]`}
-                    style={{ aspectRatio: aspectMap[idx] || fallbackAspect }}
-                  > 
-                    {m.type === 'video' ? (
-                      <video
-                        controls
-                        preload="metadata"
-                        playsInline
-                        className="w-full h-full object-contain block"
-                        onLoadedMetadata={(e) => {
-                          const v = e.currentTarget;
-                          const w = v.videoWidth || 16;
-                          const h = v.videoHeight || 9;
-                          setAspectMap((s) => ({ ...s, [idx]: `${w}/${h}` }));
-                        }}
+                  <div className="border border-[var(--border)] rounded-md overflow-hidden bg-[var(--surface)] max-w-2xl w-full">
+                    <div className="p-3 flex items-center justify-between">
+                      <span className="text-xs px-2 py-1 rounded bg-[var(--background)] border border-[var(--border)] uppercase">
+                        {m.type}
+                      </span>
+                      <span
+                        className="text-xs text-[var(--placeholder)] truncate max-w-[200px]"
+                        title={m.url}
                       >
-                        <source src={apiUrl(`/api/download?disposition=inline&url=${encodeURIComponent(m.url)}`)} />
-                        Your browser does not support the video tag.
-                      </video>
-                    ) : /\/reel\//i.test(form.getValues().url || '') ? (
-                      <video
-                        controls
-                        preload="metadata"
-                        playsInline
-                        className="w-full h-full object-contain block"
-                        onLoadedMetadata={(e) => {
-                          const v = e.currentTarget;
-                          const w = v.videoWidth || 9;
-                          const h = v.videoHeight || 16;
-                          setAspectMap((s) => ({ ...s, [idx]: `${w}/${h}` }));
-                        }}
+                        {new URL(m.url).hostname}
+                      </span>
+                    </div>
+                    <div className="bg-neutral-900 aspect-square sm:aspect-video flex items-center justify-center overflow-hidden relative">
+                      {m.type?.toLowerCase() === "image" ? (
+                        <Image
+                          src={m.url}
+                          alt="preview"
+                          width={800}
+                          height={600}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : m.type?.toLowerCase() === "video" ? (
+                        <video
+                          controls
+                          preload="metadata"
+                          className="w-full h-full object-contain"
+                          poster={m.thumbnail}
+                        >
+                          <source
+                            src={apiUrl(
+                              `/api/download?disposition=inline&url=${encodeURIComponent(m.url)}`
+                            )}
+                          />
+                          Your browser does not support the video tag.
+                        </video>
+                      ) : m.thumbnail ? (
+                        <Image
+                          src={m.thumbnail}
+                          alt="thumbnail"
+                          width={800}
+                          height={600}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="p-4 text-xs text-[var(--placeholder)]">
+                          No preview available
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-3 border-t border-[var(--border)] bg-[var(--surface)]">
+                      <a
+                        href={apiUrl(`/api/download?url=${encodeURIComponent(m.url)}`)}
+                        className="w-full inline-flex items-center justify-center gap-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900"
+                        aria-label="Download media"
                       >
-                        <source src={apiUrl(`/api/download?disposition=inline&url=${encodeURIComponent(m.url)}`)} />
-                        Your browser does not support the video tag.
-                      </video>
-                    ) : (
-                      <img
-                        src={apiUrl(`/api/download?disposition=inline&url=${encodeURIComponent(m.url)}`)}
-                        alt={`Media preview ${idx + 1} (${m.type})`}
-                        className="w-full h-full object-contain block"
-                        onLoad={(e) => {
-                          const img = e.currentTarget as HTMLImageElement;
-                          const w = img.naturalWidth || 16;
-                          const h = img.naturalHeight || 9;
-                          setAspectMap((s) => ({ ...s, [idx]: `${w}/${h}` }));
-                        }}
-                        onError={(e) => (e.currentTarget.src = 'https://placehold.co/1200x675/161616/8b8b8b?text=Preview+Unavailable')}
-                      />
-                    )}
-
-                    {m.type === 'video' && (
-                      <div className="pointer-events-none absolute right-3 top-3 rounded-full bg-black/40 text-white px-2 py-1 text-[10px] font-semibold">
-                        {variant === 'reel' ? 'REEL' : 'VIDEO'}
-                      </div>
-                    )}
+                        Download
+                      </a>
+                    </div>
                   </div>
-
-                  {/* Actions */}
-                  <div className="px-4 py-3 flex gap-2 border-t border-[var(--border)] bg-[var(--surface)]">
-                    <a
-                      href={apiUrl(`/api/download?disposition=attachment&url=${encodeURIComponent(m.url)}`)}
-                      className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm font-medium"
-                      download={`instagram_media_${idx + 1}.${m.type === 'video' ? 'mp4' : 'jpg'}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Download
-                    </a>
-                  </div>
-                </div>
-              );})}
+                );
+              })()}
             </div>
           )}
         </section>
+
+        {/* Disclaimer */}
+        <section className="mt-10 border-t border-neutral-200 dark:border-neutral-800 pt-4">
+          <h2 className="font-medium mb-2">Disclaimer</h2>
+          <p className="text-xs text-[var(--placeholder)]">
+            Downloading media you do not own may violate Instagram’s Terms of Service and copyright laws. This tool is for educational and personal use only. Respect creators’ rights.
+          </p>
+        </section>
+
+        {/* Footer */}
+        <footer className="mt-8 pt-6 border-t border-neutral-200 dark:border-neutral-800">
+          <div className="flex flex-wrap gap-4 justify-center text-xs text-[var(--placeholder)]">
+            <a href="/terms" className="hover:text-[var(--foreground)] transition-colors">
+              Terms & Conditions
+            </a>
+            <span>•</span>
+            <a href="/privacy" className="hover:text-[var(--foreground)] transition-colors">
+              Privacy Policy
+            </a>
+            <span>•</span>
+            <a href="/dmca" className="hover:text-[var(--foreground)] transition-colors">
+              DMCA Policy
+            </a>
+            <span>•</span>
+            <a href="/disclaimer" className="hover:text-[var(--foreground)] transition-colors">
+              Legal Disclaimer
+            </a>
+          </div>
+          <p className="text-center text-xs text-[var(--placeholder)] mt-4">
+            © {new Date().getFullYear()} Instagram Post Downloader. For educational purposes only.
+          </p>
+        </footer>
       </div>
-      {/* Footer */}
-      <footer className="mt-10 text-center text-sm text-gray-500">
-        <p>
-          <Link href="/privacy" className="hover:underline">Privacy Policy</Link> |{" "}
-          <Link href="/terms" className="hover:underline">Terms of Service</Link> |{" "}
-          <Link href="/disclaimer" className="hover:underline">Disclaimer</Link> |{" "}
-          <Link href="/dmca" className="hover:underline">DMCA</Link>
-        </p>
-        <p className="mt-2">&copy; {new Date().getFullYear()} Fast Download</p>
-      </footer>
     </div>
   );
 }
