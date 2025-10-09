@@ -14,7 +14,7 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 // Interface matching the NormalizedMedia defined in resolve/route.ts
-type MediaItem = { url: string; type: "image" | "video" };
+type MediaItem = { url: string; type: "image" | "video"; thumbnail?: string };
 
 export default function Home() {
   const API_BASE = (process.env.NEXT_PUBLIC_API_BASE || "").replace(/\/$/, "");
